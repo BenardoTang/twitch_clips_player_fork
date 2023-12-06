@@ -264,58 +264,60 @@ $(document).ready(function () {
             if (self || !message.startsWith('!')) return;
 
             if (user['message-type'] === 'chat' && message.startsWith('!' + command)) {
+                if (user.mod || user.username === mainAccount) {
 
-                // Remove element before loading the clip
-                $('#text-container').remove();
-                $('#details-container').remove();
+                    // Remove element before loading the clip
+                    $('#text-container').remove();
+                    $('#details-container').remove();
 
-                // Get second command. ie: stop
-                let commandOption = message.split(' ')[1];
+                    // Get second command. ie: stop
+                    let commandOption = message.split(' ')[1];
 
-                // Stop the clips player
-                if (commandOption === "stop") {
-                    // Reload browser source
-                    window.location.reload();
-                }
-
-                // Create an array of channel names
-                cmdArray = message.split('@').map(element => element.trim()); //Split channel names using the @ symbol
-                cmdArray = cmdArray.slice(1);
-                cmdArray = cmdArray.filter(String);
-
-                // If command also contains @channel names
-                if (cmdArray.length > 0) {
-
-                    // Redeclare channel array as cmdArray from the ! command
-                    channel = cmdArray;
-
-                    // Randomly grab a channel from the list to start from
-                    if (shuffle === 'true' && channel.length > 0) {
-                        // shuffle the list of channel names
-                        shuffleArray(channel);
-                        // grab a random channel from the chanel list
-                        clip_index = Math.floor((Math.random() * channel.length - 1) + 1);
-                    } else {
-                        // grab the first item in the list to start from
-                        clip_index = 0;
+                    // Stop the clips player
+                    if (commandOption === "stop") {
+                        // Reload browser source
+                        window.location.reload();
                     }
-                }
 
-                if (so === 'true' && ref) {
-                    // wait 1 second for TMI to connect to Twitch before loading clip and doing a shoutout
-                    setTimeout(function () {
-                        // Play a clip
+                    // Create an array of channel names
+                    cmdArray = message.split('@').map(element => element.trim()); //Split channel names using the @ symbol
+                    cmdArray = cmdArray.slice(1);
+                    cmdArray = cmdArray.filter(String);
+
+                    // If command also contains @channel names
+                    if (cmdArray.length > 0) {
+
+                        // Redeclare channel array as cmdArray from the ! command
+                        channel = cmdArray;
+
+                        // Randomly grab a channel from the list to start from
+                        if (shuffle === 'true' && channel.length > 0) {
+                            // shuffle the list of channel names
+                            shuffleArray(channel);
+                            // grab a random channel from the chanel list
+                            clip_index = Math.floor((Math.random() * channel.length - 1) + 1);
+                        } else {
+                            // grab the first item in the list to start from
+                            clip_index = 0;
+                        }
+                    }
+
+                    if (so === 'true' && ref) {
+                        // wait 1 second for TMI to connect to Twitch before loading clip and doing a shoutout
+                        setTimeout(function () {
+                            // Play a clip
+                            if (modOnly === 'true' && (user.mod || user.username === mainAccount)) {
+                                loadClip(channel[clip_index]);
+                            } else if (modOnly === 'false' || user.username === mainAccount) {
+                                loadClip(channel[clip_index]);
+                            }
+                        }, 1000);
+                    } else {
                         if (modOnly === 'true' && (user.mod || user.username === mainAccount)) {
                             loadClip(channel[clip_index]);
                         } else if (modOnly === 'false' || user.username === mainAccount) {
                             loadClip(channel[clip_index]);
                         }
-                    }, 1000);
-                } else {
-                    if (modOnly === 'true' && (user.mod || user.username === mainAccount)) {
-                        loadClip(channel[clip_index]);
-                    } else if (modOnly === 'false' || user.username === mainAccount) {
-                        loadClip(channel[clip_index]);
                     }
                 }
             }
